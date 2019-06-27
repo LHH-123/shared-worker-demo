@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>client2</title>
+  </head>
+  <body>
+    <style>
+      .button {
+        width: 200px;
+        height: 40px;
+        margin: 0 auto;
+        text-align: center;
+        line-height: 40px;
+        text-align: center;
+        margin-bottom: 40px;
+        margin-top: 40px;
+        border: 1px solid #000;
+        cursor: pointer;
+      }
+      #msg-wrapper {
+        text-align: center;
+      }
+    </style>
+    <div class="button" onclick="sendMsg()">向客户端1发送消息</div>
+    <div class="button" onclick="showNotification()">拉取客户端1发送的消息</div>
+    <div id="msg-wrapper"></div>
+    <script>
+      var myWorker;
+
+      if (!!window.SharedWorker) {
+        myWorker = new SharedWorker("./sw.js");
+      }
+
+      myWorker.port.onmessage = function(e) {
+        console.log("client2 Message received from worker");
+        if (e.data && e.data.type == 2) {
+          console.log(e.data);
+          var node = document.createElement("P");
+          var textnode = document.createTextNode(e.data.detail);
+          node.appendChild(textnode);
+          document.getElementById("msg-wrapper").appendChild(node);
+        }
+      };
+      function sendMsg() {
+        var msg = {
+          type: 1,
+          detail: "我是client2，消息是来自client1"
+        };
+        myWorker.port.postMessage(msg);
+        console.log("Message posted to worker");
+      }
+
+      function showNotification() {
+        myWorker.port.postMessage("get");
+      }
+    </script>
+  </body>
+</html>
