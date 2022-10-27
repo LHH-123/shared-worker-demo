@@ -2,4 +2,4 @@
 A demo with this is a test shared worker
 test
 
-测试
+测试test2
